@@ -1,3 +1,5 @@
+require('dotenv').config();
+const Contact = require('./models/contact');
 const express = require('express');
 var morgan = require('morgan')
 const app = express();
@@ -5,7 +7,7 @@ app.use(express.static('build'));
 app.use(express.json());
 morgan.token('body', (req,res) => JSON.stringify(req.body));
 app.use(morgan(`:method :url :status :req[content-length] :response-time ms :body - `))
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 
 let phonebook = [
     {
@@ -31,7 +33,10 @@ let phonebook = [
 ]
 
 app.get('/api/persons', (req,res)=> {
-    res.status(200).send(phonebook);
+    Contact.find({}).then(contact => {
+        res.json(contact);
+    })
+    //res.status(200).send(phonebook);
 })
 
 app.get('/api/persons/:id', (req,res)=> {
@@ -61,9 +66,15 @@ app.post('/api/persons', (req,res)=> {
         return;
     }
 
-    let newContact = {id:`${Math.floor(100000*Math.random())}`, name: `${req.body.name}`, number:`${req.body.number}`}
-    phonebook.push(newContact);
-    res.status(200).send(phonebook);
+    const newContact = new Contact({
+        name: req.body.name,
+        number: req.body.number
+    })
+    
+    newContact.save().then(savedContact => {
+        console.log("saved contact",savedContact);
+        res.json(savedContact)
+    })
 })
 
 
