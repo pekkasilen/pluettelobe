@@ -59,12 +59,14 @@ app.delete('/api/persons/:id', (req,res)=> {
     })
 })
 
-app.put('/api/persons/:id', (req,res) => {
+app.put('/api/persons/:id', (req,res,next) => {
     console.log(req.body.number);
     Contact.findByIdAndUpdate(req.params.id, {number: req.body.number}).then((cont)=>{
         console.log("cont",cont);
         cont.number=req.body.number;
         res.json(cont);
+    }).catch(err=> {
+        next(err);
     })
 })
 
