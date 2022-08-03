@@ -56,6 +56,8 @@ app.delete('/api/persons/:id', (req,res)=> {
     Contact.findByIdAndRemove(req.params.id).then((cont)=> {
         console.log(cont);
         res.json(cont)
+    }).catch(err => {
+        next(err)
     })
 })
 
